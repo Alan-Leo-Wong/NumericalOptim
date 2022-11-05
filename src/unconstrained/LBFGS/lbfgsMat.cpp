@@ -2,7 +2,7 @@
 // Created by lei on 22-11-4.
 //
 
-#include "../../include/unconstrained/lbfgsMat.h"
+#include "../../../include/unconstrained/LBFGS/lbfgsMat.h"
 
 namespace optim {
     template<typename Scalar>
@@ -71,4 +71,4 @@ namespace optim {
             j = (j + 1) % m_m;
         }
     }
-}
+} // namespace optim

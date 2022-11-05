@@ -5,7 +5,7 @@
 #ifndef NUMERICOPTIM_LBFGSMAT_H
 #define NUMERICOPTIM_LBFGSMAT_H
 
-#include "../utils/geometry.h"
+#include "../../utils/geometry.h"
 
 namespace optim {
     using namespace geometry;
@@ -45,14 +45,14 @@ namespace optim {
         void add_correction(const RefConstVec<Scalar> &s, const RefConstVec<Scalar> &y);
 
         /**
-         * Recursive formula to compute the descend dir of LBFGS: inv(H) * desc_grad,
+         * Recursive formula to compute the final (descent) direction of LBFGS: inv(H) * desc_grad,
          * where H0 = (1/theta) * I is the initial approximation of the Hessian Matrix H
-         * @param grad grad
-         * @param a a scalar, its default value is -1 to achieve descend grad direction
+         * @param grad grad of objective function f at iteration #iter
+         * @param a a scalar, its default value is -1 to achieve descent grad direction
          * @param res_dir inv(H) * desc_grad, which is initialized by a * grad
          */
-        void apply_Hg(const Vector<Scalar> desc_grad, const Scalar &a, Vector<Scalar> &res_dir);
-    };
-}
+        void apply_Hg(const Vector<Scalar> grad, const Scalar &a, Vector<Scalar> &res_dir);
+    }; // class end
+} // namespace optim
 
 #endif //NUMERICOPTIM_LBFGSMAT_H

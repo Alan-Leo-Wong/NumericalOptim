@@ -157,6 +157,11 @@ namespace optim {
             int max_iterations;
 
             ///
+            /// Whether use line search algorithm
+            ///
+            bool use_ls = true;
+
+            ///
             /// The parameters about line search algorithm.
             ///
             LineSearch<Scalar> ls;

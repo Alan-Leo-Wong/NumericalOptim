@@ -5,14 +5,16 @@
 #ifndef NUMERICOPTIM_BFGS_H
 #define NUMERICOPTIM_BFGS_H
 
-#include "../utils/geometry.h"
-#include "../utils/optim_settings.h"
+#include "../../utils/geometry.h"
+#include "../../utils/optim_settings.h"
 #include "lbfgsMat.h"
+#include "../../line_search/LineSearchMoreThuente.h"
 
 namespace optim {
     using namespace geometry;
 
-    template<typename Scalar>
+    template<typename Scalar,
+            template<class> class LineSearch = LineSearchMoreThuente>
     class LBFGSSolver {
     private:
         const settings::LBFGSParam<Scalar> &m_param;    // Parameters to control the LBFGS algorithm
@@ -71,22 +73,77 @@ namespace optim {
             Scalar step = Scalar(1) / m_dir.norm();
 
             // Number of iterations used
-            int k = 1;
+            int iter = 1;
 
             while (true) {
                 // Save the current x and gradient
                 m_px.noalias() = x;
                 m_pgrad.noalias() = m_grad;
-
                 // compute grad.dot(dir), i.e. grad^T * dir
                 Scalar gd = m_grad.dot(m_dir);
-
                 const Scalar step_max = m_param.ls.max_step;
 
+                /// Line Search for step
+                // Line search to update x, fx and gradient
+                LineSearch<Scalar>::LineSearch(f, m_param, m_px, m_dir,
+                                               step_max, step,
+                                               fx, m_grad, gd, x);
+                // New gradient norm
+                m_gnorm = m_grad.norm();
 
+                // std::cout << "Iter " << iter << " finished line search" << std::endl;
+                // std::cout << "   x = " << x.transpose() << std::endl;
+                // std::cout << "   f(x) = " << fx << ", ||grad|| = " << m_gnorm << std::endl << std::endl;
+
+                /// Convergence test
+                // Convergence test -- gradient
+                if (m_gnorm <= m_param.epsilon || m_gnorm <= m_param.rel_epsilon * x.norm()) {
+                    return iter;
+                }
+                // Convergence test -- objective function value
+                if (f_past > 0) {
+                    const Scalar fx_d = m_fx[iter % f_past];
+                    if (iter >= f_past &&
+                        abs(fx_d - fx) <= m_param.delta *
+                                          std::max(std::max(abs(fx), abs(fx_d)), Scalar(1)))
+                        return iter;
+                    m_fx[iter % f_past] = fx;
+                }
+                // Maximum number of iterations
+                if (m_param.max_iterations != 0 && iter >= m_param.max_iterations)
+                    return iter;
+
+                /// Approximate Hessian Matrix H to find direction
+                // Update s and y
+                // Let k = iter
+                // s_{k+1} = x_{k+1} - x_k
+                // y_{k+1} = g_{k+1} - g_k
+                m_H.add_correction(x - m_px, m_grad - m_pgrad);
+
+                // Recursive formula to compute m_dir = -inv(m_H) * g (g = m_grad)
+                m_H.apply_Hg(m_grad, -Scalar(1), m_dir);
+
+                /// Ready to next iteration
+                // Reset step = 1.0 as initial guess for the next line search
+                step = Scalar(1);
+                iter++;
             }
         }
-    };
-}
+
+        ///
+        /// Returning the gradient vector on the last iterate.
+        /// Typically used to debug and test convergence.
+        /// Should only be called after the `minimize()` function.
+        ///
+        /// \return A const reference to the gradient vector.
+        ///
+        const Vector<Scalar> &final_grad() const { return m_grad; }
+
+        ///
+        /// Returning the Euclidean norm of the final gradient.
+        ///
+        Scalar final_grad_norm() const { return m_gnorm; }
+    }; // class end
+}  // namespace optim
 
 #endif //NUMERICOPTIM_BFGS_H

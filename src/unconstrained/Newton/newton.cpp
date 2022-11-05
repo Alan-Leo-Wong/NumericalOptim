@@ -2,7 +2,7 @@
 // Created by lei on 22-11-1.
 //
 
-#include "../../include/unconstrained/newton.h"
+#include "../../../include/unconstrained/Newton/newton.h"
 
 namespace optim {
     using namespace geometry;

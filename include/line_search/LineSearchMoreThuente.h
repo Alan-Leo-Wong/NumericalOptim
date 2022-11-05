@@ -119,8 +119,8 @@ namespace optim {
             return (z3 * ba > Scalar(0)) ? ((std::max)(r1, r2)) : ((std::min)(r1, r2));
         }
 
-        // Select the next step size according to the current step sizes(Section 4, Page 13 of the paper),
-        // Interval values a, function values f, and derivatives g(f')
+        /// Select the next step size according to the current step sizes(Section 4, Page 298 of the paper),
+        // Interval values a, function values f, and derivatives values g (f')
         // _l and _u are the endpoints of the interval I
         static Scalar step_selection(
                 const Scalar &al, const Scalar &au, const Scalar &at,
@@ -211,7 +211,7 @@ namespace optim {
         ///                 Out: The gradient at the new point.
         /// \param dg       In: The inner product between dir and grad.
         ///                 Out: The inner product between dir and the new gradient.
-        /// \param x        Out: The new point moved to.
+        /// \param x        Out: The new point moved to. x = px + dir * step
         ///
         template<typename Func, typename SolverParam>
         void LineSearch(Func &f, const SolverParam &param,

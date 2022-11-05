@@ -5,8 +5,8 @@
 #ifndef NUMERICOPTIM_NEWTON_H
 #define NUMERICOPTIM_NEWTON_H
 
-#include "../utils/geometry.h"
-#include "../utils/optim_settings.h"
+#include "../../utils/geometry.h"
+#include "../../utils/optim_settings.h"
 
 namespace optim {
     using namespace geometry;

@@ -5,6 +5,7 @@
 #ifndef NUMERICOPTIM_UNCONSRAINED_ALL_H
 #define NUMERICOPTIM_UNCONSRAINED_ALL_H
 
-#include "newton.h"
+#include "Newton/newton.h"
+#include "LBFGS/lbfgs.h"
 
 #endif //NUMERICOPTIM_UNCONSRAINED_ALL_H
