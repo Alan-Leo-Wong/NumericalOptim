@@ -31,7 +31,8 @@ int main(int argc, char **argv) {
     double fx;
     int iter = lbfgsSolver.minimize(obj_func, x, fx);
 
-    std::cout << iter << " iterations" << std::endl;
-    std::cout << "x = \n" << x.transpose() << std::endl;
+    std::cout << "------finished------\n";
+    std::cout << "passed " << iter << " iterations" << std::endl;
+    std::cout << "x = " << x.transpose() << std::endl;
     std::cout << "f(x) = " << fx << std::endl;
 }

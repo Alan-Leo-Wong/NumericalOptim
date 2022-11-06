@@ -220,7 +220,7 @@ namespace optim {
                                Scalar &fx, Vector<Scalar> &grad,
                                Scalar &gd, Vector<Scalar>& x) {
 
-            std::cout << "========================= Entering line search =========================\n\n";
+            // std::cout << "========================= Entering line search =========================\n\n";
 
             /// Initial
             // Check the value of step (\alpha),
@@ -254,9 +254,7 @@ namespace optim {
                     (Scalar(1) - param.ls.ftol) * gd_init, g_psiI_hi = std::numeric_limits<Scalar>::infinity();
 
             // Function value and gradient at the current step size
-            std::cout << "px: " << px << ", step: " << step << ", dir: " << dir << std::endl;
             x = px + step * dir; // update to new point by using the initial direction and step
-            std::cout << "x: " << x << std::endl;
             // grad = f'(x + step * dir)
             fx = f(x, grad); // Value of the new point x
             // gd = f'(x + step * dir) * dir
@@ -265,8 +263,8 @@ namespace optim {
             // Convergence test
             // Maybe initial value already have converged
             if (fx <= fx_init + step * test_dec && std::abs(gd) <= test_curv) {
-                std::cout << "** Criteria met\n\n";
-                std::cout << "========================= Leaving line search =========================\n\n";
+                /*std::cout << "** Criteria met\n\n";
+                std::cout << "========================= Leaving line search =========================\n\n";*/
                 return;
             }
 
@@ -297,7 +295,7 @@ namespace optim {
                     psiI_hi = psi_t;
                     g_psiI_hi = g_psi_t;
 
-                    std::cout << "Case 1: new step = " << new_step << std::endl;
+                    // std::cout << "Case 1: new step = " << new_step << std::endl;
                 } else if (g_psi_t * (I_lo - step) > Scalar(0)) {
                     /// Case 2: psi_t <= psi_l and g_psi_t * (al -at) > 0
                     // Page 291 of Moré and Thuente (1994) suggests that
@@ -308,7 +306,7 @@ namespace optim {
                     psiI_lo = psi_t;
                     g_psiI_lo = g_psi_t;
 
-                    std::cout << "Case 2: new step = " << new_step << std::endl;
+                    // std::cout << "Case 2: new step = " << new_step << std::endl;
                 } else {
                     /// Case 3: psi_t <= psi_l and g_psi_t * (al -at) <= 0
                     new_step = step_selection(I_lo, I_hi, step,
@@ -323,7 +321,7 @@ namespace optim {
                     psiI_lo = psi_t;
                     g_psiI_lo = g_psi_t;
 
-                    std::cout << "Case 3: new step = " << new_step << std::endl;
+                    // std::cout << "Case 3: new step = " << new_step << std::endl;
                 }
 
                 // Case 1 and 3 are interpolations, whereas Case 2 is extrapolation
@@ -337,8 +335,8 @@ namespace optim {
                 /// In case step, new_step, and step_max are equal,
                 // directly return the computed x and fx
                 if (step == step_max && new_step >= step_max) {
-                    std::cout << "** Maximum step size reached\n\n";
-                    std::cout << "========================= Leaving line search =========================\n\n";
+                    /*std::cout << "** Maximum step size reached\n\n";
+                    std::cout << "========================= Leaving line search =========================\n\n";*/
                     return;
                 }
 
@@ -356,12 +354,12 @@ namespace optim {
                 fx = f(x, grad);
                 gd = grad.dot(dir);
 
-                std::cout << "step = " << step << ", fx = " << fx << ", gd = " << gd << std::endl;
+                // std::cout << "step = " << step << ", fx = " << fx << ", gd = " << gd << std::endl;
 
                 // Convergence test
                 if (fx <= fx_init + step * test_dec && std::abs(gd) <= test_curv) {
-                    std::cout << "** Criteria met\n\n";
-                    std::cout << "========================= Leaving line search =========================\n\n";
+                    /*std::cout << "** Criteria met\n\n";
+                    std::cout << "========================= Leaving line search =========================\n\n";*/
                     return;
                 }
 
@@ -379,14 +377,13 @@ namespace optim {
                 if (step >= step_max) {
                     const Scalar psit = fx - fx_init - step * test_dec;
                     if (psit <= psiI_lo) {
-                        std::cout << "** Maximum step size reached\n\n";
-                        std::cout << "========================= Leaving line search =========================\n\n";
+                        /*std::cout << "** Maximum step size reached\n\n";
+                        std::cout << "========================= Leaving line search =========================\n\n";*/
                         return;
                     }
                 }
             }
 
-            std::cout << "iter: " << iter << std::endl;
             if (iter >= param.ls.max_line_search)
                 throw ::std::runtime_error(
                         "The line search routine reached the maximum number of iterations and no satisfied step was found!");

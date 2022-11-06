@@ -55,14 +55,11 @@ namespace optim {
         inline void add_correction(const RefConstVec<Scalar> &s, const RefConstVec<Scalar> &y) {
             const int loc = m_ptr % m_m; // 指向当前最新加入的用于修正海塞矩阵的向量
 
-//            std::cout << "m_s = " << m_s << std::endl;
             m_s.col(loc).noalias() = s;
-//            std::cout << "m_y = " << m_y << std::endl;
             m_y.col(loc).noalias() = y;
 
             // ys 代表 y^Ts = 1/rho
             const Scalar ys = m_y.col(loc).dot(m_s.col(loc));
-            std::cout << "ys = " << ys << std::endl;
             m_ys[loc] = ys;
 
             m_theta = m_y.col(loc).squaredNorm() / ys;
@@ -92,7 +89,6 @@ namespace optim {
                 j = (j + m_m - 1) % m_m;
 
                 // scalar \alpha_j = \rho_j * {s_j}^T * res_dir
-                std::cout << "loop1: m_ys[j]: " << m_ys[j] << std::endl;
                 m_alpha[j] = m_s.col(j).dot(res_dir) / m_ys[j]; // ys = 1/rho
 
                 // res_dir = res_dir - \alpha_j * y_j
@@ -101,13 +97,11 @@ namespace optim {
 
             // Step3: compute center
             // res_dir = inv(H0) * res_dir, H0 = \theta * I
-            std::cout << "m_theta " << m_theta << std::endl;
             res_dir /= m_theta;
 
             // Step4: compute left product
             for (size_t i = 0; i < m_corr_num; ++i) {
                 // scalar beta = \rho_j * {y_j}^T * res_dir
-                std::cout << "loop2: m_ys[j]: " << m_ys[j] << std::endl;
                 const Scalar beta = m_y.col(j).dot(res_dir) / m_ys[j];
 
                 // res_dir = res_dir + (\alpha_j - \beta) * s_j
