@@ -19,10 +19,10 @@ namespace optim {
         typedef Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic> Matrixi;
         typedef Eigen::Matrix<unsigned int, Eigen::Dynamic, Eigen::Dynamic> Matrixui;*/
         template<typename Scalar>
-        using Vector =  Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
+        using Vector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
 
         template<typename Scalar>
-        using Matrix =  Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;
+        using Matrix = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;
 
         template<typename Scalar>
         using RefVec = Eigen::Ref<Vector<Scalar>>;

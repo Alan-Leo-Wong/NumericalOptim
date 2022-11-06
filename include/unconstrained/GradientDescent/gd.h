@@ -1,9 +1,9 @@
 //
-// Created by lei on 22-11-1.
+// Created by lei on 22-11-6.
 //
 
-#ifndef NUMERICOPTIM_NEWTON_H
-#define NUMERICOPTIM_NEWTON_H
+#ifndef NUMERICOPTIM_GD_H
+#define NUMERICOPTIM_GD_H
 
 #include "../../utils/geometry.h"
 #include "../../line_search/LineSearchMoreThuente.h"
@@ -13,10 +13,9 @@ namespace optim {
 
     template<typename Scalar,
             template<class> class LineSearch = LineSearchMoreThuente>
-    class NewtonSolver {
+    class GDSolver {
     private:
         const settings::GDParam<Scalar> &m_param;       // Parameters to control the Gradient Descent algorithm
-        Matrix<Scalar> m_H;                             // Hessian matrix (manual provide)
         Vector<Scalar> m_fx;                            // History of the objective function values
         Vector<Scalar> m_px;                            // Old(past) xVector<Scalar> m_grad;                          // Current gradient
         Vector<Scalar> m_grad;                          // Current gradient
@@ -35,7 +34,7 @@ namespace optim {
                 m_fx.resize(m_param.past);
         }
 
-        NewtonSolver(const settings::NewtonParam<Scalar> &param) : m_param(param) {
+        GDSolver(const settings::GDParam<Scalar> &param) : m_param(param) {
             m_param.check_param();
         }
 
@@ -62,7 +61,7 @@ namespace optim {
             const int f_past = m_param.past;
 
             // Evaluate function and compute the current gradient
-            fx = f(x, m_grad, m_H);
+            fx = f(x, m_grad);
             m_gnorm = m_grad.norm();
             if (f_past > 0) m_fx[0] = fx;
 
@@ -71,14 +70,14 @@ namespace optim {
                 return 1;
             }
 
-            m_dir.noalias() = -m_H.colPivHouseholderQr().solve(m_grad);
+            m_dir.noalias() = -m_grad;
             // Initial step size (\alpha)
             Scalar step = Scalar(1) / m_dir.norm();
 
             // Number of iterations used
             int iter = 1;
 
-            while (true) {
+            while (true){
                 // Save the current x and gradient
                 m_px.noalias() = x;
                 // compute grad.dot(dir), i.e. grad^T * dir
@@ -90,8 +89,7 @@ namespace optim {
                 LineSearch<Scalar>::LineSearch(f, m_param, m_px, m_dir,
                                                step_max, step,
                                                fx, m_grad, gd, x);
-                // New Hessian Matrix
-                f(x, m_grad, m_H);
+
                 // New gradient norm
                 m_gnorm = m_grad.norm();
 
@@ -118,7 +116,7 @@ namespace optim {
                     return iter;
 
                 /// Ready to next iteration
-                m_dir.noalias() = -m_H.colPivHouseholderQr().solve(m_grad);
+                m_dir = -m_grad;
                 // Reset step = 1.0 as initial guess for the next line search
                 step = Scalar(1);
                 iter++;
@@ -135,15 +133,10 @@ namespace optim {
         const Vector<Scalar> &final_grad() const { return m_grad; }
 
         ///
-        /// Returning the Hessian Matrix on the last iterate.
-        ///
-        const Vector<Scalar> &final_hessian() const { return m_H; }
-
-        ///
         /// Returning the Euclidean norm of the final gradient.
         ///
         Scalar final_grad_norm() const { return m_gnorm; }
     }; // class end
 } // namespace optim
 
-#endif //NUMERICOPTIM_NEWTON_H
+#endif //NUMERICOPTIM_GD_H

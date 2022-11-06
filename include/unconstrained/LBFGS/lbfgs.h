@@ -29,7 +29,16 @@ namespace optim {
     public:
         // Reset internal variables
         // n: dimension of the vector to be optimized
-        inline void reset(int n);
+        inline void reset(int n) {
+            const int m = m_param.m;
+            m_H.reset(n, m);
+            m_px.resize(n);
+            m_grad.resize(n);
+            m_pgrad.resize(n);
+            m_dir.resize(n);
+            if (m_param.past > 0)
+                m_fx.resize(m_param.past);
+        }
 
         LBFGSSolver(const settings::LBFGSParam<Scalar> &param) : m_param(param) {
             m_param.check_param();
@@ -48,11 +57,12 @@ namespace optim {
         /// \return Number of iterations used.
         ///
         template<typename Func>
-        inline int minimize(Func &f, Vector<Scalar> x, Scalar &fx) {
+        inline int minimize(Func &f, Vector<Scalar> &x, Scalar &fx) {
             using std::abs;
 
             // Dimension of the vector
             const size_t n = x.size();
+            reset(n);
 
             // The length of iteration lag for objective function value to test convergence
             const int f_past = m_param.past;
@@ -118,10 +128,12 @@ namespace optim {
                 // Let k = iter
                 // s_{k+1} = x_{k+1} - x_k
                 // y_{k+1} = g_{k+1} - g_k
+                std::cout << "x = " << x << ", m_px = " << m_px << std::endl;
                 m_H.add_correction(x - m_px, m_grad - m_pgrad);
 
                 // Recursive formula to compute m_dir = -inv(m_H) * g (g = m_grad)
                 m_H.apply_Hg(m_grad, -Scalar(1), m_dir);
+//                std::cout << "m_dir: " << m_dir << std::endl;
 
                 /// Ready to next iteration
                 // Reset step = 1.0 as initial guess for the next line search
@@ -144,6 +156,6 @@ namespace optim {
         ///
         Scalar final_grad_norm() const { return m_gnorm; }
     }; // class end
-}  // namespace optim
+} // namespace optim
 
 #endif //NUMERICOPTIM_BFGS_H
