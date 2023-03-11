@@ -1,2 +1,2 @@
 # NumericOptim
-The implementation of some numeric optimization algorithms.
+The implementation of some numerical optimization algorithms.
